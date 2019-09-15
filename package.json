@@ -1,6 +1,6 @@
 {
   "name": "robot-hooks",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Hooks for use with Robot finite state machines",
   "main": "machine.js",
   "module": "machine.js",
