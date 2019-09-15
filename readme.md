@@ -16,6 +16,11 @@ Or Yarn:
 yarn add robot-hooks
 ```
 
+## 📚 [Documentation](https://thisrobot.life/integrations/robot-hooks.html)
+
+* This repo (and other integrations) are documented [on thisrobot.life](https://thisrobot.life/integrations/robot-hooks.html).
+* Please star ⭐️ [this repo](https://github.com/matthewp/robot-hooks).
+
 ## License
 
 BSD-2-Clause
