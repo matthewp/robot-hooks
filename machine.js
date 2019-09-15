@@ -1,9 +1,14 @@
 import { interpret } from 'robot3';
 const { create, freeze } = Object;
 
+function valueEnumerable(value) {
+  return { enumerable: true, value };
+}
+
 function createCurrent(service) {
   return freeze(create(service.machine.state, {
-    context: { enumerable: true, value: service.context || {} }
+    context: valueEnumerable(service.context || {}),
+    service: valueEnumerable(service)
   }));
 }
 
@@ -13,9 +18,12 @@ export function createUseMachine(useMemo, useState) {
       return interpret(machine, service => {
         setCurrent(createCurrent(service));
       });
-    }, []);
+    }, [machine]);
   
-    let [current, setCurrent] = useState(createCurrent(service));
+    let [currentState, setCurrent] = useState(createCurrent(service));
+    let current = useMemo(() => (
+      currentState.service === service ? currentState : createCurrent(service)
+    ), [service, currentState]);
   
     return [current, service.send, service];
   };
