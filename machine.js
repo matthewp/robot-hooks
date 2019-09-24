@@ -12,19 +12,29 @@ function createCurrent(service) {
   }));
 }
 
-export function createUseMachine(useMemo, useState) {
-  return function useMachine(machine) {
-    let service = useMemo(() => {
-      return interpret(machine, service => {
-        setCurrent(createCurrent(service));
+export function createUseMachine(useEffect, useState) {
+  return function useMachine(providedMachine) {
+    let [machine, setMachine] = useState(providedMachine);
+    let [service, setService] = useState(runInterpreter);
+
+    function runInterpreter(m = machine) {
+      return interpret(m, service => {
+        setCurrent(createCurrent(service.child || service));
       });
-    }, [machine]);
-  
-    let [currentState, setCurrent] = useState(createCurrent(service));
-    let current = useMemo(() => (
-      currentState.service === service ? currentState : createCurrent(service)
-    ), [service, currentState]);
-  
+    }
+
+    let [current, setCurrent] = useState(createCurrent(service));
+
+    useEffect(() => {
+      if(machine !== providedMachine) {
+        setMachine(providedMachine);
+
+        let newService = runInterpreter(providedMachine);
+        setService(newService);
+        setCurrent(createCurrent(newService));
+      }
+    }, [providedMachine]);
+
     return [current, service.send, service];
   };
 }

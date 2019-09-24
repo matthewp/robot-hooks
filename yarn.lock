@@ -370,10 +370,10 @@ rimraf@^2.6.1:
   dependencies:
     glob "^7.1.3"
 
-robot3@0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/robot3/-/robot3-0.2.0.tgz#b58e82ec1b5866fe62cc8a6ac28c4610ac301e01"
-  integrity sha512-bYEXBh7G11rY3OAgQBoBdmP+ypoXnsctVbrOmfqvuSLWXca9UsDBTC/mWL6ULIY1pVGY0iE41IkNl8XA3Y0K7Q==
+robot3@0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/robot3/-/robot3-0.2.3.tgz#73708e51fc4c811f9e9c2852ab026fb47648cdba"
+  integrity sha512-GN9mEYRE1OE5rfcaILacUK8IRgXbsogao8y+8pNo1Jw6Zq2R6ObPdFuTIUousZwjPCCoIYB7KiiVi0UDB9R1TQ==
 
 safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"

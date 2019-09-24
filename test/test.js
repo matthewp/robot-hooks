@@ -1,10 +1,31 @@
-import { createMachine, state, transition } from 'robot3';
+import { createMachine, state, transition, invoke } from 'robot3';
 import { createUseMachine } from '../machine.js';
-import { component, useEffect, useMemo, useState, html } from 'https://unpkg.com/haunted/haunted.js';
+import { component, useEffect, useState, html } from 'https://unpkg.com/haunted/haunted.js';
 
-const useMachine = createUseMachine(useMemo, useState);
+const useMachine = createUseMachine(useEffect, useState);
 
 const later = () => new Promise(resolve => setTimeout(resolve, 50));
+
+let namesCount = 0;
+async function createSandbox(App, cb) {
+  let tag = `element-${namesCount++}`;
+  let Element = component(App);
+  customElements.define(tag, Element);
+  let el = new Element();
+  document.body.append(el);
+  await later();
+
+  let gen = cb(el.shadowRoot);
+
+  while(true) {
+    let { done } = gen.next(el.shadowRoot);
+    if(done) {
+      break;
+    }
+    await later();
+  }
+  el.remove();
+}
 
 QUnit.module('useMachine', hooks => {
   QUnit.test('Basics', async assert => {
@@ -80,6 +101,48 @@ QUnit.module('useMachine', hooks => {
     assert.equal(text(), 'Machine two', 'the second machine');
 
     el.remove();
+  });
 
+  QUnit.test('Invoking machines the "current" is the child machine', async assert => {
+    const nested = createMachine({
+      nestedOne: state(
+        transition('next', 'nestedTwo')
+      ),
+      nestedTwo: state()
+    });
+    const machine = createMachine({
+      one: state(
+        transition('next', 'two')
+      ),
+      two: invoke(nested, 
+        transition('done', 'three')
+      ),
+      three: state()
+    });
+
+    let current, send, service;
+    function App() {
+      const [currentState, sendEvent, thisService] = useMachine(machine);
+      current = currentState;
+      send = sendEvent;
+      service = thisService;
+
+      return html`
+        <div>State: ${current.name}</div>
+      `;
+    }
+
+    await createSandbox(App, function* (shadow) {
+      let el = shadow.firstElementChild;
+      let text = () => el.textContent.trim();
+
+      assert.equal(text(), 'State: one');
+      yield send('next');
+
+      assert.equal(text(), 'State: nestedOne');
+      yield service.child.send('next');
+      
+      assert.equal(text(), 'State: three');
+    });
   });
 });
