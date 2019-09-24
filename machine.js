@@ -17,7 +17,8 @@ export function createUseMachine(useEffect, useState) {
     let [machine, setMachine] = useState(providedMachine);
     let [service, setService] = useState(runInterpreter);
 
-    function runInterpreter(m = machine) {
+    function runInterpreter(arg) {
+      let m = arg || machine;
       return interpret(m, service => {
         setCurrent(createCurrent(service.child || service));
       });
