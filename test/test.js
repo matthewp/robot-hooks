@@ -145,4 +145,38 @@ QUnit.module('useMachine', hooks => {
       assert.equal(text(), 'State: three');
     });
   });
+
+  QUnit.test('Doesn\'t update when the component is torn down', async assert => {
+    let machine = createMachine({
+      one: state(
+        transition('toggle', 'two')
+      ),
+      two: state(
+        transition('toggle', 'one')
+      )
+    });
+
+    let sendEvent;
+    let tag = `element-teardown`;
+    let Element = component(function() {
+      let [current, send] = useMachine(machine);
+      sendEvent = send;
+      return html`<span>${current.name}</span>`;
+    });
+    customElements.define(tag, Element);
+    let el = new Element();
+    document.body.append(el);
+    await later();
+
+    let span = el.shadowRoot.firstElementChild;
+    assert.equal(span.textContent, 'one');
+
+    el.remove();
+    await later();
+
+    sendEvent('toggle');
+    await later();
+
+    assert.equal(span.textContent, 'one', 'did not change');
+  });
 });
