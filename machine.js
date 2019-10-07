@@ -17,9 +17,13 @@ export function createUseMachine(useEffect, useState) {
     let [machine, setMachine] = useState(providedMachine);
     let [service, setService] = useState(runInterpreter);
 
+    let mounted = true;
     function runInterpreter(arg, data) {
       let m = arg || machine;
       return interpret(m, service => {
+        if (!mounted) {
+          return;
+        }
         setCurrent(createCurrent(service.child || service));
       }, data || initialContext);
     }
@@ -33,6 +37,10 @@ export function createUseMachine(useEffect, useState) {
         let newService = runInterpreter(providedMachine, initialContext);
         setService(newService);
         setCurrent(createCurrent(newService));
+      }
+
+      return () => {
+        mounted = false;
       }
     }, [providedMachine, initialContext]);
 
