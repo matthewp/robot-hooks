@@ -13,19 +13,19 @@ function createCurrent(service) {
 }
 
 export function createUseMachine(useEffect, useState) {
-  return function useMachine(providedMachine) {
+  return function useMachine(providedMachine, initialContext) {
     let [machine, setMachine] = useState(providedMachine);
     let [service, setService] = useState(runInterpreter);
 
     let mounted = true;
-    function runInterpreter(arg) {
+    function runInterpreter(arg, data) {
       let m = arg || machine;
       return interpret(m, service => {
         if (!mounted) {
           return;
         }
         setCurrent(createCurrent(service.child || service));
-      });
+      }, data || initialContext);
     }
 
     let [current, setCurrent] = useState(createCurrent(service));
@@ -34,14 +34,15 @@ export function createUseMachine(useEffect, useState) {
       if(machine !== providedMachine) {
         setMachine(providedMachine);
 
-        let newService = runInterpreter(providedMachine);
+        let newService = runInterpreter(providedMachine, initialContext);
         setService(newService);
         setCurrent(createCurrent(newService));
       }
+
       return () => {
         mounted = false;
       }
-    }, [providedMachine]);
+    }, [providedMachine, initialContext]);
 
     return [current, service.send, service];
   };

@@ -67,6 +67,36 @@ QUnit.module('useMachine', hooks => {
     app.remove();
   });
 
+  QUnit.test('passes along initial context', async assert => {
+    const context = initial => ({ ...initial });
+
+    const machine = createMachine({
+      solid: state()
+    }, context);
+
+    function App() {
+      const [current] = useMachine(machine, { test: 42 });
+
+      return html`
+        <span>
+          Context: ${JSON.stringify(current.context)}
+        </span>
+      `;
+    }
+
+    const Element = component(App);
+    customElements.define('initial-context', Element);
+
+    let app = new Element();
+    document.body.append(app);
+    let root = app.shadowRoot;
+
+    await later();
+
+    assert.equal(root.firstElementChild.textContent.trim(), 'Context: {"test":42}');
+    app.remove();
+  });
+
   QUnit.test('can change machines', async assert => {
     const basicMachine = (name) => createMachine({
       [name]: state()
