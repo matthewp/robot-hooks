@@ -4,7 +4,6 @@
   "description": "Hooks for use with Robot finite state machines",
   "main": "machine.js",
   "module": "machine.js",
-  "type": "module",
   "files": [
     "machine.js"
   ],
