@@ -209,4 +209,34 @@ QUnit.module('useMachine', hooks => {
 
     assert.equal(span.textContent, 'one', 'did not change');
   });
+
+  QUnit.test('Can pass context for the initial value', async assert => {
+    let current, send;
+    let machine = createMachine({
+      one: state(
+        transition('next', 'two')
+      ),
+      two: state()
+    });
+
+    function App() {
+      const [currentState, sendEvent] = useMachine(machine, {});
+      current = currentState;
+      send = sendEvent;
+
+      return html`
+        <div>State: ${current.name}</div>
+      `;
+    }
+
+    await createSandbox(App, function* (shadow) {
+      let el = shadow.firstElementChild;
+      let text = () => el.textContent.trim();
+
+      assert.equal(text(), 'State: one');
+      yield send('next');
+
+      assert.equal(text(), 'State: two');
+    });
+  });
 });
