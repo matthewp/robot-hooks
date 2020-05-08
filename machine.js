@@ -42,7 +42,7 @@ export function createUseMachine(useEffect, useState) {
       return () => {
         mounted = false;
       }
-    }, [providedMachine, initialContext]);
+    }, [providedMachine]);
 
     return [current, service.send, service];
   };
