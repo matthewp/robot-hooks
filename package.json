@@ -5,7 +5,8 @@
   "main": "dist/machine.js",
   "module": "machine.js",
   "files": [
-    "machine.js"
+    "machine.js",
+    "index.d.ts"
   ],
   "scripts": {
     "server": "http-server -p 1965",
