@@ -31,6 +31,8 @@ export function createUseMachine(useEffect, useState) {
     let [current, setCurrent] = useState(createCurrent(service));
 
     useEffect(() => {
+      mounted = true;
+
       if(machine !== providedMachine) {
         setMachine(providedMachine);
 
@@ -47,4 +49,3 @@ export function createUseMachine(useEffect, useState) {
     return [current, service.send, service];
   };
 }
-
